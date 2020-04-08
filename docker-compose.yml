@@ -47,20 +47,20 @@ services:
       - "5601:5601"
     restart: always
 
-  nginx:
-    image: nginx
-    links:
-      - "fluentd"
-    depends_on: 
-      - "fluentd"
-    ports:
-      - "80:80"
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: localhost:24224
-        tag: nginx
-    restart: always
+  # nginx:
+  #   image: nginx
+  #   links:
+  #     - "fluentd"
+  #   depends_on: 
+  #     - "fluentd"
+  #   ports:
+  #     - "80:80"
+  #   logging:
+  #     driver: "fluentd"
+  #     options:
+  #       fluentd-address: localhost:24224
+  #       tag: nginx
+  #   restart: always
 
   demo:
     build: ./example
@@ -71,6 +71,23 @@ services:
       - "fluentd"
       - "elasticsearch"
       - "kibana"
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        tag: docker.{{.Name}}
+
+  httpd:
+    image: httpd
+    container_name: httpd
+    links: 
+      - "fluentd"
+    depends_on: 
+      - "fluentd"
+      - "elasticsearch"
+      - "kibana"
+    ports:
+      - "80:80"
     logging:
       driver: "fluentd"
       options:

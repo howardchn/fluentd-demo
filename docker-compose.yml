@@ -4,6 +4,7 @@ services:
     build: ./fluentd
     volumes:
       - ./fluentd/conf:/fluentd/etc
+      - ./fluentd/plugins:/fluentd/plugins
     links:
       - "elasticsearch"
     depends_on:

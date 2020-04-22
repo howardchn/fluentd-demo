@@ -2,11 +2,10 @@ version: '2'
 services:
   fluentd:
     build: ./fluentd
+    container_name: fluentd_demo
     volumes:
       - ./fluentd/conf:/fluentd/etc
       - ./fluentd/plugins:/fluentd/plugins
-    links:
-      - "elasticsearch"
     depends_on:
       - "elasticsearch"
     ports:
@@ -19,9 +18,10 @@ services:
             max-file: "5"
     restart: always
 
+
   elasticsearch:
     image: elasticsearch:6.6.2
-    container_name: elasticsearch
+    container_name: elasticsearch_demo
     ports:
       - "9200:9200"
     environment:
@@ -37,11 +37,10 @@ services:
     volumes:
       - ./data:/usr/share/elasticsearch/data
 
+
   kibana:
     image: kibana:6.6.2
-    container_name: kibana
-    links:
-      - "elasticsearch"
+    container_name: kibana_demo
     depends_on: 
       - "elasticsearch"
     ports:
@@ -66,31 +65,24 @@ services:
   demo:
     build: ./example
     container_name: demo
-    links: 
+    depends_on:
       - "fluentd"
-    depends_on: 
-      - "fluentd"
-      - "elasticsearch"
-      - "kibana"
     logging:
       driver: "fluentd"
       options:
-        fluentd-address: "localhost:24224"
-        tag: docker.{{.Name}}
+        tag: moblab.{{.Name}}
+
+
 
   httpd:
     image: httpd
     container_name: httpd
-    links: 
+    depends_on:
       - "fluentd"
-    depends_on: 
-      - "fluentd"
-      - "elasticsearch"
-      - "kibana"
     ports:
-      - "80:80"
+      - "8083:80"
     logging:
       driver: "fluentd"
       options:
-        fluentd-address: "localhost:24224"
-        tag: docker.{{.Name}}
+        tag: moblab.{{.Name}}
+
